@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>VideoPost • ИТД Видеопостинг</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { min-height: 100vh; height: auto; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0d0d0d;
+            color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background-image:
+                radial-gradient(ellipse at 20% 30%, rgba(255,255,255,0.02) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 70%, rgba(255,255,255,0.01) 0%, transparent 50%);
+        }
+        .app { max-width: 520px; width: 100%; }
+
+        .glass {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 32px;
+            padding: 36px 30px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .glass::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 60%);
+            pointer-events: none;
+            border-radius: 32px;
+        }
+        .glass:focus-within {
+            border-color: rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 28px;
+            position: relative;
+            z-index: 1;
+        }
+        .header .logo {
+            width: 44px;
+            height: 44px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .header .logo svg {
+            width: 24px;
+            height: 24px;
+            stroke: #f5f5f5;
+            stroke-width: 1.5;
+            fill: none;
+        }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            color: #f5f5f5;
+        }
+        .header .sub {
+            font-size: 13px;
+            color: rgba(255,255,255,0.25);
+            font-weight: 400;
+            display: block;
+            margin-top: -2px;
+        }
+        .header-right {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-right .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            display: inline-block;
+        }
+        .header-right .status-dot.offline {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: rgba(255,255,255,0.25);
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        input, textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 14px 18px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            color: #f5f5f5;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus, textarea:focus {
+            border-color: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06);
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.02);
+        }
+        input::placeholder, textarea::placeholder {
+            color: rgba(255,255,255,0.15);
+        }
+        textarea { resize: vertical; min-height: 72px; line-height: 1.5; }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            color: #f5f5f5;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        .btn svg {
+            width: 20px; height: 20px;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            fill: none;
+        }
+        .btn:hover {
+            background: rgba(255,255,255,0.07);
+            border-color: rgba(255,255,255,0.1);
+            transform: translateY(-1px);
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary {
+            background: #f5f5f5;
+            color: #0d0d0d;
+            border-color: #f5f5f5;
+        }
+        .btn-primary:hover {
+            background: #ffffff;
+            border-color: #ffffff;
+            box-shadow: 0 4px 20px rgba(255,255,255,0.05);
+        }
+        .btn-outline {
+            background: transparent;
+            border-color: rgba(255,255,255,0.06);
+        }
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.1);
+        }
+
+        .file-zone {
+            border: 2px dashed rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 36px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+        .file-zone:hover {
+            border-color: rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.02);
+        }
+        .file-zone.dragover {
+            border-color: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.04);
+        }
+        .file-zone svg {
+            width: 40px; height: 40px;
+            stroke: rgba(255,255,255,0.08);
+            stroke-width: 1.5;
+            fill: none;
+            display: block;
+            margin: 0 auto 8px;
+        }
+        .file-zone .label {
+            color: rgba(255,255,255,0.2);
+            font-size: 14px;
+        }
+        .file-zone .filename {
+            color: rgba(255,255,255,0.3);
+            font-size: 13px;
+            margin-top: 8px;
+            display: block;
+        }
+        input[type="file"] { display: none; }
+
+        .status {
+            font-size: 13px;
+            color: rgba(255,255,255,0.1);
+            text-align: center;
+            margin-top: 16px;
+            padding: 10px;
+            border-radius: 12px;
+            transition: 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+        .status.success { color: #4ade80; background: rgba(74,222,128,0.04); }
+        .status.error { color: #f87171; background: rgba(248,113,113,0.04); }
+        .status.loading { color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.02); }
+
+        .hidden { display: none !important; }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 14px;
+            position: relative;
+            z-index: 1;
+        }
+        .btn-group .btn { flex: 1; }
+
+        /* Модалка */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 999;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal-box {
+            background: rgba(255,255,255,0.04);
+            backdrop-filter: blur(48px);
+            -webkit-backdrop-filter: blur(48px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 32px;
+            padding: 40px 32px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .modal-box svg {
+            width: 56px; height: 56px;
+            stroke: #f5f5f5;
+            stroke-width: 1.5;
+            fill: none;
+            display: block;
+            margin: 0 auto 12px;
+        }
+        .modal-box h3 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+        .modal-box p { color: rgba(255,255,255,0.25); font-size: 14px; margin-bottom: 24px; }
+        .modal-box .btn { width: auto; padding: 10px 32px; display: inline-block; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes pop { from { transform: scale(0.92) translateY(16px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+
+        .divider {
+            height: 1px;
+            background: rgba(255,255,255,0.04);
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width: 480px) {
+            .glass { padding: 24px 18px; border-radius: 28px; }
+            .header h1 { font-size: 20px; }
+            .btn-group { flex-direction: column; }
+            .modal-box { padding: 28px 20px; border-radius: 28px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app" id="app">
+    <!-- ШАГ 1: ЛОГИН -->
+    <div id="stepLogin" class="glass">
+        <div class="header">
+            <div class="logo">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M3 9h18"/><path d="M9 3v18"/></svg>
+            </div>
+            <div>
+                <h1>VideoPost</h1>
+                <span class="sub">видеопостинг в ИТД</span>
+            </div>
+            <div class="header-right">
+                <span class="status-dot offline"></span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Юзернейм</label>
+            <input type="text" id="usernameInput" placeholder="kellov42" value="kellov42">
+        </div>
+        <div class="input-group">
+            <label>Пароль</label>
+            <input type="password" id="passwordInput" placeholder="••••••••">
+        </div>
+
+        <button class="btn btn-primary" onclick="login()">
+            <svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+            Войти
+        </button>
+        <div id="loginStatus" class="status"></div>
+    </div>
+
+    <!-- ШАГ 2: ЗАГРУЗКА ВИДЕО -->
+    <div id="stepUpload" class="glass hidden">
+        <div class="header">
+            <div class="logo">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M3 9h18"/><path d="M9 3v18"/></svg>
+            </div>
+            <div>
+                <h1>VideoPost</h1>
+                <span class="sub" id="userDisplay">@kellov42</span>
+            </div>
+            <div class="header-right">
+                <span class="status-dot"></span>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Описание</label>
+            <textarea id="captionInput" rows="2" placeholder="Напишите что-нибудь к видео..."></textarea>
+        </div>
+
+        <div class="file-zone" id="fileZone" onclick="document.getElementById('fileInput').click()">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span class="label">Выберите видео или перетащите сюда</span>
+            <span class="filename" id="fileName"></span>
+        </div>
+        <input type="file" id="fileInput" accept="video/*" onchange="handleFile(event)">
+
+        <button class="btn btn-primary" onclick="uploadVideo()">
+            <svg viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><polyline points="16 17 12 13 8 17"/><polyline points="16 11 12 7 8 11"/></svg>
+            Опубликовать
+        </button>
+        <div id="uploadStatus" class="status"></div>
+
+        <div class="divider"></div>
+
+        <div class="btn-group">
+            <button class="btn btn-outline" onclick="logout()">
+                <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Выйти
+            </button>
+            <button class="btn btn-outline" onclick="switchAccount()">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Сменить
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- МОДАЛКА -->
+<div class="modal-overlay" id="modal">
+    <div class="modal-box">
+        <svg viewBox="0 0 24 24" id="modalIcon"><path d="M20 6L9 17l-5-5"/></svg>
+        <h3 id="modalTitle">Готово!</h3>
+        <p id="modalDesc">Видео опубликовано в ИТД</p>
+        <button class="btn btn-primary" onclick="closeModal()">Отлично</button>
+    </div>
+</div>
+
+<script>
+    // ============================================================
+    //  ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ
+    // ============================================================
+    let selectedFile = null;
+    let sessionId = localStorage.getItem('videoSessionId') || null;
+    let username = localStorage.getItem('videoUsername') || null;
+    let token = localStorage.getItem('videoToken') || null;
+
+    // ============================================================
+    //  ФАЙЛЫ
+    // ============================================================
+    function handleFile(e) {
+        const file = e.target.files[0];
+        if (file) {
+            selectedFile = file;
+            document.getElementById('fileName').textContent = file.name;
+        }
+    }
+
+    const zone = document.getElementById('fileZone');
+    zone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        zone.classList.add('dragover');
+    });
+    zone.addEventListener('dragleave', () => {
+        zone.classList.remove('dragover');
+    });
+    zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('dragover');
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('video/')) {
+            selectedFile = file;
+            document.getElementById('fileName').textContent = file.name;
+        }
+    });
+
+    // ============================================================
+    //  ЛОГИН
+    // ============================================================
+    async function login() {
+        const username = document.getElementById('usernameInput').value.trim();
+        const password = document.getElementById('passwordInput').value;
+
+        if (!username || !password) {
+            showStatus('loginStatus', 'Введите юзернейм и пароль', 'error');
+            return;
+        }
+
+        showStatus('loginStatus', 'Проверка...', 'loading');
+
+        try {
+            const res = await fetch('https://itd.com/api/v1/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+
+            const data = await res.json();
+
+            if (data.success && data.token) {
+                token = data.token;
+                sessionId = 'session_' + Date.now();
+                username = username;
+                localStorage.setItem('videoToken', token);
+                localStorage.setItem('videoSessionId', sessionId);
+                localStorage.setItem('videoUsername', username);
+                showStatus('loginStatus', '✅ Вход выполнен', 'success');
+                enterUploadMode(username);
+            } else {
+                showStatus('loginStatus', '❌ ' + (data.error || 'Неверные данные'), 'error');
+            }
+        } catch (e) {
+            showStatus('loginStatus', '❌ Ошибка соединения', 'error');
+        }
+    }
+
+    function enterUploadMode(username) {
+        document.getElementById('userDisplay').textContent = '@' + username;
+        document.getElementById('stepLogin').classList.add('hidden');
+        document.getElementById('stepUpload').classList.remove('hidden');
+    }
+
+    // ============================================================
+    //  ЗАГРУЗКА ВИДЕО
+    // ============================================================
+    async function uploadVideo() {
+        if (!selectedFile) {
+            showStatus('uploadStatus', 'Выберите видео', 'error');
+            return;
+        }
+        if (!token) {
+            showStatus('uploadStatus', 'Сначала войдите', 'error');
+            return;
+        }
+
+        showStatus('uploadStatus', 'Загрузка видео...', 'loading');
+
+        try {
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            const uploadRes = await fetch('https://itd.com/api/v1/media/upload', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            });
+
+            const uploadData = await uploadRes.json();
+
+            if (!uploadData.success || !uploadData.attachmentId) {
+                throw new Error(uploadData.error || 'Ошибка загрузки видео');
+            }
+
+            const attachmentId = uploadData.attachmentId;
+            const caption = document.getElementById('captionInput').value || '';
+
+            const postRes = await fetch('https://itd.com/api/v1/posts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    content: caption,
+                    attachmentIds: [attachmentId]
+                })
+            });
+
+            const postData = await postRes.json();
+
+            if (postData.success) {
+                showStatus('uploadStatus', '✅ Видео опубликовано!', 'success');
+                openModal('✅', 'Готово!', 'Видео опубликовано в ИТД');
+                selectedFile = null;
+                document.getElementById('fileName').textContent = '';
+                document.getElementById('captionInput').value = '';
+                document.getElementById('fileInput').value = '';
+            } else {
+                showStatus('uploadStatus', '❌ ' + (postData.error || 'Ошибка создания поста'), 'error');
+            }
+        } catch (e) {
+            showStatus('uploadStatus', '❌ ' + e.message, 'error');
+        }
+    }
+
+    // ============================================================
+    //  УПРАВЛЕНИЕ АККАУНТАМИ
+    // ============================================================
+    function switchAccount() {
+        document.getElementById('stepUpload').classList.add('hidden');
+        document.getElementById('stepLogin').classList.remove('hidden');
+        document.getElementById('passwordInput').value = '';
+        showStatus('loginStatus', '', '');
+        showStatus('uploadStatus', '', '');
+        localStorage.removeItem('videoSessionId');
+        localStorage.removeItem('videoUsername');
+        localStorage.removeItem('videoToken');
+        sessionId = null;
+        username = null;
+        token = null;
+        selectedFile = null;
+        document.getElementById('fileName').textContent = '';
+        document.getElementById('captionInput').value = '';
+    }
+
+    function logout() { switchAccount(); }
+
+    // ============================================================
+    //  МОДАЛКА
+    // ============================================================
+    function openModal(emoji, title, desc) {
+        document.getElementById('modalIcon').innerHTML = '<path d="M20 6L9 17l-5-5"/>';
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('modalDesc').textContent = desc;
+        document.getElementById('modal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('modal').classList.remove('active');
+    }
+
+    // ============================================================
+    //  УТИЛИТЫ
+    // ============================================================
+    function showStatus(id, msg, type) {
+        const el = document.getElementById(id);
+        el.textContent = msg;
+        el.className = 'status' + (type ? ' ' + type : '');
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
+    document.getElementById('modal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeModal();
+    });
+
+    // ============================================================
+    //  АВТОЗАПУСК
+    // ============================================================
+    if (sessionId && username && token) {
+        enterUploadMode(username);
+    }
+</script>
+</body>
+</html>
